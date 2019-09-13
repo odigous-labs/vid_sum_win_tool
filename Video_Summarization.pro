@@ -17,10 +17,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     main.cpp \
-    home.cpp
+    home.cpp \
+    video.cpp
 
 HEADERS += \
-    home.h
+    home.h \
+    video.h
 
 FORMS += \
     home.ui
