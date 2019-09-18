@@ -21,3 +21,8 @@ QString Video::getVideoName()
     return file_info.fileName();
 
 }
+
+QUrl *Video::getUrl() const
+{
+    return url;
+}

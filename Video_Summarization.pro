@@ -18,10 +18,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     home.cpp \
+    messagebox.cpp \
+    playlist.cpp \
     video.cpp
 
 HEADERS += \
     home.h \
+    messagebox.h \
+    playlist.h \
     video.h
 
 FORMS += \
