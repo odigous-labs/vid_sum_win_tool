@@ -9,7 +9,8 @@
 #include <QMediaPlayer>
 #include <QStringListModel>
 
-#include <QtMultimediaWidgets/qvideowidget.h>
+//#include <QtMultimediaWidgets/qvideowidget.h>
+#include "videowidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Home; }
@@ -34,19 +35,22 @@ private slots:
     void on_media_position_changed(qint64 progress);
     void on_media_duration_changed(qint64 duration);
     void on_media_seek(int position);
+    void on_gen_sum_btn_clicked();
 
 private:
     Ui::Home *ui;
-    QVideoWidget *videoWidget =nullptr;
+    VideoWidget *videoWidget =nullptr;
     QMediaPlayer *mediaPlayer =nullptr;
     bool is_playing = false;
     MessageBox *msg_box = nullptr;
     QStringListModel *play_list_viewmodel;
     Playlist *media_playlist;
-
+protected:
+    void mousePressEvent(QMouseEvent *ev);
+    void paintEvent(QPaintEvent *ev);
 
 signals:
-    void refresh_playlist();\
+    void refresh_playlist();
     void playing_started();
 
 };

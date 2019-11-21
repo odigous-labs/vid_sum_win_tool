@@ -20,13 +20,17 @@ SOURCES += \
     home.cpp \
     messagebox.cpp \
     playlist.cpp \
-    video.cpp
+    rubberband.cpp \
+    video.cpp \
+    videowidget.cpp
 
 HEADERS += \
     home.h \
     messagebox.h \
     playlist.h \
-    video.h
+    rubberband.h \
+    video.h \
+    videowidget.h
 
 FORMS += \
     home.ui

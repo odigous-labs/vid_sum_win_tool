@@ -1,11 +1,14 @@
 #include "home.h"
 #include "ui_home.h"
 #include "video.h"
+#include "videowidget.h"
 
 #include <QFileDialog>
 #include <QStyle>
 #include <QDebug>
 #include <QMessageBox>
+#include <QProcess>
+#include <QPainter>
 
 Home::Home(QWidget *parent)
     : QMainWindow(parent)
@@ -14,7 +17,7 @@ Home::Home(QWidget *parent)
     ui->setupUi(this);
 
     //initializing variables
-    videoWidget =new QVideoWidget();
+    videoWidget =new VideoWidget(this);
     ui->gridLayout->addWidget(videoWidget);
     mediaPlayer = new QMediaPlayer;
     media_playlist = new Playlist();
@@ -31,6 +34,9 @@ Home::Home(QWidget *parent)
     ui->previous_button->setIcon(style()->standardIcon(QStyle::SP_MediaSkipBackward));
     ui->next_button->setIcon(style()->standardIcon(QStyle::SP_MediaSkipForward));
     ui->open_button->setIcon(style()->standardIcon(QStyle::SP_FileIcon));
+    ui->comboBox->addItem("Keyframes");
+    ui->comboBox->addItem("Skim");
+    ui->object_radio_btn->setChecked(true);
 
     //connecting signal and slots
     connect(this,SIGNAL(refresh_playlist()),this,SLOT(on_refresh_playlist_signal_emitted()));
@@ -69,7 +75,6 @@ void Home::on_refresh_playlist_signal_emitted()
 {
 
     this->play_list_viewmodel->setStringList(*this->media_playlist->getPlayList());
-
     this->ui->play_button->setEnabled(true);
 }
 
@@ -87,18 +92,12 @@ void Home::on_open_button_clicked()
         }
         emit refresh_playlist();
     }
-
-
 }
-
-
 
 void Home::on_next_button_clicked()
 {
     this->media_playlist->next();
     emit on_playing_started();
-
-
 }
 
 void Home::on_previous_button_clicked()
@@ -117,6 +116,7 @@ void Home::on_playing_started()
     qDebug()<<"playing started";
     ui->slider->setRange(0,(this->mediaPlayer->duration()/1000));
     qDebug()<<"range set to"<<(this->mediaPlayer->duration()/1000);
+    ui->selected_video_label->setText(mediaPlayer->currentMedia().canonicalUrl().toString());
 }
 
 void Home::on_media_position_changed(qint64 progress)
@@ -135,4 +135,39 @@ void Home::on_media_duration_changed(qint64 duration)
 void Home::on_media_seek(int position)
 {
     mediaPlayer->setPosition(position*1000);
+}
+
+
+
+
+void Home::on_gen_sum_btn_clicked()
+{
+    QProcess p;
+    QStringList params;
+    QString pythonPath = "C:/ProgramData/Anaconda3/python.exe";
+    QString pythonScript = "D:/Campus/FYP/Implementations/windows_tool/python_scripts/video_to_frames.py";
+    QString inputVideo = "D:/Campus/FYP/Implementations/windows_tool/python_scripts/Jumps.mp4";
+    QString outputPath = "D:/Campus/FYP/Implementations/windows_tool/python_scripts/fold/";
+    params << pythonScript<<inputVideo<<outputPath;
+    p.start(pythonPath, params);
+    p.waitForFinished(-1);
+    while(p.canReadLine()){
+        qDebug()<<"this has been executed";
+        qDebug()<<p.readLine();
+    }
+//    QString p_stdout = p.readAll();
+//    QString p_stderr = p.readAllStandardError();
+//    if(!p_stderr.isEmpty())
+//        qDebug()<<"Python error:"<<p_stderr;
+    //    qDebug()<<"Python result="<<p_stdout;
+}
+
+void Home::mousePressEvent(QMouseEvent *ev)
+{
+
+}
+
+void Home::paintEvent(QPaintEvent *ev)
+{
+
 }
