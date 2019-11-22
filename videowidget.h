@@ -19,6 +19,8 @@ protected:
 private:
     RubberBand *rubberBand_up;
     RubberBand *rubberBand_down;
+    RubberBand *rubberBand_left;
+    RubberBand *rubberBand_right;
     QPoint origin;
     QRect rect;
 };
