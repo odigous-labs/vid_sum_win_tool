@@ -18,8 +18,8 @@ void RubberBand::paintEvent(QPaintEvent *ev)
     pen.setStyle(Qt::SolidLine);
    painter.begin(this);
    painter.setPen(pen);
-    painter.setBrush(QColor(255, 0, 0, 255));
-   painter.fillRect(ev->rect(),QBrush(QColor(255, 0, 0, 255)));
+    //painter.setBrush(QColor(255, 0, 0, 255));
+  painter.fillRect(ev->rect(),QBrush(QColor(255, 0, 0, 255)));
    painter.end();
     //QRubberBand::paintEvent(ev);
 

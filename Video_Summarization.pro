@@ -22,6 +22,7 @@ SOURCES += \
     playlist.cpp \
     rubberband.cpp \
     video.cpp \
+    videoframegrabber.cpp \
     videowidget.cpp
 
 HEADERS += \
@@ -30,6 +31,7 @@ HEADERS += \
     playlist.h \
     rubberband.h \
     video.h \
+    videoframegrabber.h \
     videowidget.h
 
 FORMS += \

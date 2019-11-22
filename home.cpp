@@ -2,11 +2,12 @@
 #include "ui_home.h"
 #include "video.h"
 #include "videowidget.h"
+#include "videoframegrabber.h"
+
 
 #include <QFileDialog>
 #include <QStyle>
 #include <QDebug>
-#include <QMessageBox>
 #include <QProcess>
 #include <QPainter>
 
@@ -18,14 +19,17 @@ Home::Home(QWidget *parent)
 
     //initializing variables
     videoWidget =new VideoWidget(this);
-    ui->gridLayout->addWidget(videoWidget);
+    videoWidget->resize(1024,768);
+    ui->verticalLayout_2->addWidget(videoWidget);
+    //ui->label_2 = videoWidget;
     mediaPlayer = new QMediaPlayer;
     media_playlist = new Playlist();
     msg_box = new MessageBox(this);
+    grabber = new VideoFrameGrabber(videoWidget);
 
     //initalizing ui elements
     mediaPlayer->setVolume(50);
-    mediaPlayer->setVideoOutput(videoWidget);
+    mediaPlayer->setVideoOutput(grabber);
     videoWidget->show();
     this->play_list_viewmodel = new QStringListModel();
     ui->play_list_view->setModel(this->play_list_viewmodel);
@@ -44,6 +48,7 @@ Home::Home(QWidget *parent)
     connect(mediaPlayer,&QMediaPlayer::positionChanged,this,&Home::on_media_position_changed);
     connect(mediaPlayer,&QMediaPlayer::durationChanged, this, &Home::on_media_duration_changed);
     connect(ui->slider,&QSlider::sliderMoved,this,&Home::on_media_seek);
+    connect (videoWidget,SIGNAL(mousePressed()),this,SLOT(on_mouse_click_on_video()));
 
 }
 
@@ -162,6 +167,16 @@ void Home::on_gen_sum_btn_clicked()
     //    qDebug()<<"Python result="<<p_stdout;
 }
 
+void Home::on_mouse_click_on_video()
+{
+    if(this->is_playing){
+        ui->play_button->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+        ui->play_button->setText("Play");
+        this->mediaPlayer->pause();
+        is_playing = false;
+    }
+}
+
 void Home::mousePressEvent(QMouseEvent *ev)
 {
 
@@ -169,5 +184,19 @@ void Home::mousePressEvent(QMouseEvent *ev)
 
 void Home::paintEvent(QPaintEvent *ev)
 {
+
+}
+
+void Home::on_capture_btn_clicked()
+{
+    QImage currentImage = *grabber->currentImage;
+    QRect selected = *videoWidget->currentRect;
+    if (currentImage.isNull()){
+        msg_box->showError("Invalid Image");
+        return;
+    }
+    QImage cropped = currentImage.copy(selected);
+    cropped.save("D:/cropped.png",0,-1);
+
 
 }

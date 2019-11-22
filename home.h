@@ -11,6 +11,8 @@
 
 //#include <QtMultimediaWidgets/qvideowidget.h>
 #include "videowidget.h"
+#include "videoframegrabber.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Home; }
@@ -36,6 +38,9 @@ private slots:
     void on_media_duration_changed(qint64 duration);
     void on_media_seek(int position);
     void on_gen_sum_btn_clicked();
+    void on_mouse_click_on_video();
+
+    void on_capture_btn_clicked();
 
 private:
     Ui::Home *ui;
@@ -45,6 +50,7 @@ private:
     MessageBox *msg_box = nullptr;
     QStringListModel *play_list_viewmodel;
     Playlist *media_playlist;
+    VideoFrameGrabber *grabber;
 protected:
     void mousePressEvent(QMouseEvent *ev);
     void paintEvent(QPaintEvent *ev);
