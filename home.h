@@ -4,6 +4,7 @@
 #include "playlist.h"
 #include "video.h"
 #include "messagebox.h"
+#include "filereader.h"
 
 #include <QMainWindow>
 #include <QMediaPlayer>
@@ -42,6 +43,8 @@ private slots:
 
     void on_capture_btn_clicked();
 
+    void on_comboBox_currentTextChanged(const QString &arg1);
+
 private:
     Ui::Home *ui;
     VideoWidget *videoWidget =nullptr;
@@ -51,6 +54,8 @@ private:
     QStringListModel *play_list_viewmodel;
     Playlist *media_playlist;
     VideoFrameGrabber *grabber;
+    FileReader *reader = nullptr;
+    QString *pythonPath = nullptr;
 protected:
     void mousePressEvent(QMouseEvent *ev);
     void paintEvent(QPaintEvent *ev);

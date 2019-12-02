@@ -162,13 +162,6 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QRadioButton" name="name_radio_btn">
-            <property name="text">
-             <string>Input object name</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </widget>
        </item>
@@ -200,6 +193,13 @@
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QProgressBar" name="progressBar">
+      <property name="value">
+       <number>24</number>
+      </property>
      </widget>
     </item>
    </layout>

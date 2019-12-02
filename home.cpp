@@ -3,6 +3,7 @@
 #include "video.h"
 #include "videowidget.h"
 #include "videoframegrabber.h"
+#include "filereader.h"
 
 
 #include <QFileDialog>
@@ -26,6 +27,8 @@ Home::Home(QWidget *parent)
     media_playlist = new Playlist();
     msg_box = new MessageBox(this);
     grabber = new VideoFrameGrabber(videoWidget);
+    reader = new FileReader();
+    reader->readFile();
 
     //initalizing ui elements
     mediaPlayer->setVolume(50);
@@ -38,9 +41,11 @@ Home::Home(QWidget *parent)
     ui->previous_button->setIcon(style()->standardIcon(QStyle::SP_MediaSkipBackward));
     ui->next_button->setIcon(style()->standardIcon(QStyle::SP_MediaSkipForward));
     ui->open_button->setIcon(style()->standardIcon(QStyle::SP_FileIcon));
-    ui->comboBox->addItem("Keyframes");
-    ui->comboBox->addItem("Skim");
+    ui->comboBox->addItem("General Summary");
+    ui->comboBox->addItem("Interest Oriented Summary");
+    ui->comboBox->addItem("Highlight");
     ui->object_radio_btn->setChecked(true);
+    ui->progressBar->setVisible(false);
 
     //connecting signal and slots
     connect(this,SIGNAL(refresh_playlist()),this,SLOT(on_refresh_playlist_signal_emitted()));
@@ -149,22 +154,33 @@ void Home::on_gen_sum_btn_clicked()
 {
     QProcess p;
     QStringList params;
-    QString pythonPath = "C:/ProgramData/Anaconda3/python.exe";
-    QString pythonScript = "D:/Campus/FYP/Implementations/windows_tool/python_scripts/video_to_frames.py";
+    QString pythonPath = reader->getPythonPath();
+    QString pythonScript;
     QString inputVideo = "D:/Campus/FYP/Implementations/windows_tool/python_scripts/Jumps.mp4";
-    QString outputPath = "D:/Campus/FYP/Implementations/windows_tool/python_scripts/fold/";
-    params << pythonScript<<inputVideo<<outputPath;
+    QString outputPath;
+
+    if(ui->comboBox->currentText() == "Highlight"){
+        pythonScript = reader->getHighlightScriptPath();
+        params <<pythonScript<< inputVideo;
+    }else if (ui->comboBox->currentText() == "General Summary"){
+        pythonScript = reader->getGeneralPath();
+    }else{
+        pythonScript = reader->getGeneralPath();
+    }
     p.start(pythonPath, params);
+    ui->progressBar->setVisible(true);
+    ui->progressBar->setRange(0,0);
     p.waitForFinished(-1);
     while(p.canReadLine()){
         qDebug()<<"this has been executed";
         qDebug()<<p.readLine();
     }
-//    QString p_stdout = p.readAll();
-//    QString p_stderr = p.readAllStandardError();
-//    if(!p_stderr.isEmpty())
-//        qDebug()<<"Python error:"<<p_stderr;
-    //    qDebug()<<"Python result="<<p_stdout;
+    ui->progressBar->setVisible(false);
+    QString p_stdout = p.readAll();
+    QString p_stderr = p.readAllStandardError();
+    if(!p_stderr.isEmpty())
+        qDebug()<<"Python error:"<<p_stderr;
+        qDebug()<<"Python result="<<p_stdout;
 }
 
 void Home::on_mouse_click_on_video()
@@ -198,5 +214,15 @@ void Home::on_capture_btn_clicked()
     QImage cropped = currentImage.copy(selected);
     cropped.save("D:/cropped.png",0,-1);
 
+
+}
+
+void Home::on_comboBox_currentTextChanged(const QString &arg1)
+{
+    if (arg1 == "Interest Oriented Summary"){
+        ui->groupBox_3->setEnabled(true);
+    }else{
+        ui->groupBox_3->setEnabled(false);
+    }
 
 }
