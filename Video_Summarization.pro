@@ -21,6 +21,7 @@ SOURCES += \
     home.cpp \
     messagebox.cpp \
     playlist.cpp \
+    pythonprocess.cpp \
     rubberband.cpp \
     video.cpp \
     videoframegrabber.cpp \
@@ -31,6 +32,7 @@ HEADERS += \
     home.h \
     messagebox.h \
     playlist.h \
+    pythonprocess.h \
     rubberband.h \
     video.h \
     videoframegrabber.h \

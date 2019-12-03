@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QProcess>
 #include <QPainter>
+#include "pythonprocess.h"
 
 Home::Home(QWidget *parent)
     : QMainWindow(parent)
@@ -167,11 +168,14 @@ void Home::on_gen_sum_btn_clicked()
     }else{
         pythonScript = reader->getGeneralPath();
     }
-    p.start(pythonPath, params);
     ui->progressBar->setVisible(true);
-    ui->progressBar->setRange(0,0);
-    p.waitForFinished(-1);
-    while(p.canReadLine()){
+    ui->progressBar->setMaximum(0);
+    ui->progressBar->setMinimum(0);
+
+    p.start(pythonPath, params);
+
+
+    while(p.waitForFinished(-1) && p.canReadLine()){
         qDebug()<<"this has been executed";
         qDebug()<<p.readLine();
     }
@@ -191,6 +195,11 @@ void Home::on_mouse_click_on_video()
         this->mediaPlayer->pause();
         is_playing = false;
     }
+}
+
+void Home::handleResults(const QString *results)
+{
+    qDebug()<<results;
 }
 
 void Home::mousePressEvent(QMouseEvent *ev)

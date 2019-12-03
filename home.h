@@ -40,7 +40,7 @@ private slots:
     void on_media_seek(int position);
     void on_gen_sum_btn_clicked();
     void on_mouse_click_on_video();
-
+    void handleResults(const QString *results);
     void on_capture_btn_clicked();
 
     void on_comboBox_currentTextChanged(const QString &arg1);
