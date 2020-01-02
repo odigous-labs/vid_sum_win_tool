@@ -11,7 +11,12 @@
 #include <QDebug>
 #include <QProcess>
 #include <QPainter>
+#include <QFuture>
+#include <QtConcurrent/QtConcurrent>
+#include <QProgressDialog>
+#include <QFutureWatcher>
 #include "pythonprocess.h"
+#include <QDesktopServices>
 
 Home::Home(QWidget *parent)
     : QMainWindow(parent)
@@ -153,38 +158,27 @@ void Home::on_media_seek(int position)
 
 void Home::on_gen_sum_btn_clicked()
 {
-    QProcess p;
-    QStringList params;
-    QString pythonPath = reader->getPythonPath();
-    QString pythonScript;
-    QString inputVideo = "D:/Campus/FYP/Implementations/windows_tool/python_scripts/Jumps.mp4";
-    QString outputPath;
 
+    pythonPath = reader->getPythonPath();
+    inputVideo =this->mediaPlayer->currentMedia().canonicalUrl().toString();
+    if (inputVideo == ""){
+        msg_box->showError("No video is selected");
+        return;
+    }
+    QString outputPath = reader->getOutputPath();
     if(ui->comboBox->currentText() == "Highlight"){
         pythonScript = reader->getHighlightScriptPath();
         params <<pythonScript<< inputVideo;
     }else if (ui->comboBox->currentText() == "General Summary"){
         pythonScript = reader->getGeneralPath();
+        params << pythonScript << inputVideo;
     }else{
-        pythonScript = reader->getGeneralPath();
+        pythonScript = reader->getOOIPath();
     }
     ui->progressBar->setVisible(true);
     ui->progressBar->setMaximum(0);
     ui->progressBar->setMinimum(0);
-
-    p.start(pythonPath, params);
-
-
-    while(p.waitForFinished(-1) && p.canReadLine()){
-        qDebug()<<"this has been executed";
-        qDebug()<<p.readLine();
-    }
-    ui->progressBar->setVisible(false);
-    QString p_stdout = p.readAll();
-    QString p_stderr = p.readAllStandardError();
-    if(!p_stderr.isEmpty())
-        qDebug()<<"Python error:"<<p_stderr;
-        qDebug()<<"Python result="<<p_stdout;
+    runProcess();
 }
 
 void Home::on_mouse_click_on_video()
@@ -221,7 +215,8 @@ void Home::on_capture_btn_clicked()
         return;
     }
     QImage cropped = currentImage.copy(selected);
-    cropped.save("D:/cropped.png",0,-1);
+    this->ooiPath = "D:/cropped.png";
+    cropped.save(ooiPath,0,-1);
 
 
 }
@@ -234,4 +229,45 @@ void Home::on_comboBox_currentTextChanged(const QString &arg1)
         ui->groupBox_3->setEnabled(false);
     }
 
+}
+
+bool Home::runProcess()
+{
+
+    p = new QProcess();
+    p->start(pythonPath,params);
+    p->setReadChannel(QProcess::StandardOutput);
+    connect(p,SIGNAL(readyReadStandardOutput()),this,SLOT(readProcess()));
+    //p.startDetached(pythonPath, params);
+
+//    while(p.waitForFinished(-1) && p.canReadLine()){
+//        qDebug()<<"this has been executed";
+//        qDebug()<<p.readLine();
+//    }
+//    QString p_stdout = p.readAll();
+//    QString p_stderr = p.readAllStandardError();
+//    if(!p_stderr.isEmpty())
+//        qDebug()<<"Python error:"<<p_stderr;
+//        qDebug()<<"Python result="<<p_stdout;
+
+    ui->progressBar->setVisible(false);
+    return true;
+}
+
+void Home::readProcess()
+{
+    qDebug()<<p->readAllStandardOutput();
+}
+
+void Home::on_image_radio_btn_clicked()
+{
+   this->ooiPath = QFileDialog::getOpenFileName(this,
+        tr("Open Image as Interest"), "D://", tr("Image Files (*.jpg *.png *.jpeg)"));
+
+}
+
+void Home::on_output_btn_clicked()
+{
+    QUrl url(reader->getOutputPath());
+    QDesktopServices::openUrl(url);
 }

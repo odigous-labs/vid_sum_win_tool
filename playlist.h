@@ -20,6 +20,7 @@ public:
     void addVideo(Video* video);
     void next();
     void previous();
+    QString currentMediaURL();
     QMediaPlaylist *getMedia_playlist() const;
 private:
     bool isVideoExist(Video* video);

@@ -9,6 +9,7 @@
 #include <QMainWindow>
 #include <QMediaPlayer>
 #include <QStringListModel>
+#include <QProcess>
 
 //#include <QtMultimediaWidgets/qvideowidget.h>
 #include "videowidget.h"
@@ -44,6 +45,11 @@ private slots:
     void on_capture_btn_clicked();
 
     void on_comboBox_currentTextChanged(const QString &arg1);
+    //void runProcess();
+
+    void on_image_radio_btn_clicked();
+
+    void on_output_btn_clicked();
 
 private:
     Ui::Home *ui;
@@ -55,7 +61,15 @@ private:
     Playlist *media_playlist;
     VideoFrameGrabber *grabber;
     FileReader *reader = nullptr;
-    QString *pythonPath = nullptr;
+    QString pythonPath = nullptr;
+    QString pythonScript = nullptr;
+    QString inputVideo = nullptr;
+    QStringList params;
+    QString ooiPath = nullptr;
+    QProcess *p;
+public slots:
+    bool runProcess();
+    void readProcess();
 protected:
     void mousePressEvent(QMouseEvent *ev);
     void paintEvent(QPaintEvent *ev);

@@ -9,6 +9,7 @@ FileReader::FileReader()
     paths = new QStringList();
 }
 
+
 QString FileReader::getPythonPath()
 {
     return paths->at(0);
@@ -27,6 +28,11 @@ QString FileReader::getOOIPath()
 QString FileReader::getGeneralPath()
 {
     return paths->at(1);
+}
+
+QString FileReader::getOutputPath()
+{
+    return paths->at(4);
 }
 
 void FileReader::readFile()

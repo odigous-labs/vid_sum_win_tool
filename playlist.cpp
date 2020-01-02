@@ -61,6 +61,12 @@ void Playlist::next()
 void Playlist::previous()
 {
     this->media_playlist->previous();
+
+}
+
+QString Playlist::currentMediaURL()
+{
+    this->media_playlist->currentMedia().canonicalUrl().toString();
 }
 
 

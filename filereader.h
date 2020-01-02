@@ -13,6 +13,7 @@ public:
     QString getHighlightScriptPath();
     QString getOOIPath();
     QString getGeneralPath();
+    QString getOutputPath();
     QStringList *paths;
     void readFile();
 };
