@@ -51,6 +51,8 @@ private slots:
 
     void on_output_btn_clicked();
 
+    void on_cancelButton_clicked();
+
 private:
     Ui::Home *ui;
     VideoWidget *videoWidget =nullptr;
@@ -70,6 +72,8 @@ private:
 public slots:
     bool runProcess();
     void readProcess();
+    void readError();
+    void processFinished(int exitcode,QProcess::ExitStatus exitStatus);
 protected:
     void mousePressEvent(QMouseEvent *ev);
     void paintEvent(QPaintEvent *ev);

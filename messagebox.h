@@ -12,6 +12,7 @@ public:
     ~MessageBox();
     QMessageBox *msg_box;
     void showError(QString error_mdg);
+    void showInfo(QString info_msg);
 
 };
 

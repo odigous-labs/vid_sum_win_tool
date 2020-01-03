@@ -52,6 +52,8 @@ Home::Home(QWidget *parent)
     ui->comboBox->addItem("Highlight");
     ui->object_radio_btn->setChecked(true);
     ui->progressBar->setVisible(false);
+    ui->cancelButton->setVisible(false);
+
 
     //connecting signal and slots
     connect(this,SIGNAL(refresh_playlist()),this,SLOT(on_refresh_playlist_signal_emitted()));
@@ -168,7 +170,7 @@ void Home::on_gen_sum_btn_clicked()
     QString outputPath = reader->getOutputPath();
     if(ui->comboBox->currentText() == "Highlight"){
         pythonScript = reader->getHighlightScriptPath();
-        params <<pythonScript<< inputVideo;
+        params <<pythonScript<< inputVideo<<outputPath;
     }else if (ui->comboBox->currentText() == "General Summary"){
         pythonScript = reader->getGeneralPath();
         params << pythonScript << inputVideo;
@@ -233,30 +235,59 @@ void Home::on_comboBox_currentTextChanged(const QString &arg1)
 
 bool Home::runProcess()
 {
-
+    ui->gen_sum_btn->setEnabled(false);
+    ui->comboBox->setEnabled(false);
+    ui->cancelButton->setVisible(true);
     p = new QProcess();
-    p->start(pythonPath,params);
+
     p->setReadChannel(QProcess::StandardOutput);
     connect(p,SIGNAL(readyReadStandardOutput()),this,SLOT(readProcess()));
-    //p.startDetached(pythonPath, params);
-
-//    while(p.waitForFinished(-1) && p.canReadLine()){
-//        qDebug()<<"this has been executed";
-//        qDebug()<<p.readLine();
-//    }
-//    QString p_stdout = p.readAll();
-//    QString p_stderr = p.readAllStandardError();
-//    if(!p_stderr.isEmpty())
-//        qDebug()<<"Python error:"<<p_stderr;
-//        qDebug()<<"Python result="<<p_stdout;
-
-    ui->progressBar->setVisible(false);
+    //connect(p,SIGNAL(readyReadStandardError()),this,SLOT(readError()));
+    connect (p,SIGNAL(finished(int,QProcess::ExitStatus)),this,SLOT(processFinished(int,QProcess::ExitStatus)));
+    p->start(pythonPath,params);
     return true;
 }
 
 void Home::readProcess()
 {
-    qDebug()<<p->readAllStandardOutput();
+    QString output_buffer = p->readAllStandardOutput();
+    if(output_buffer.contains('_')){
+        QStringList words = output_buffer.split('_');
+        if(words[0] == "application"){
+            QString phasetype = words[1];
+            QString processedSteps = words[2];
+            QString all_steps = words[3];
+            if(all_steps.toInt()==0){
+                ui->progressBar->setRange(0,0);
+                ui->progreess_bar_lbl->setText(phasetype+" Processing...");
+            }else{
+                ui->progressBar->setRange(0,all_steps.toInt());
+                ui->progressBar->setValue(processedSteps.toInt());
+                ui->progreess_bar_lbl->setText(phasetype);
+            }
+            qDebug()<<output_buffer;
+        }
+    }
+}
+
+void Home::readError()
+{
+    //qDebug()<<"Error Occured";
+}
+
+void Home::processFinished(int exitcode, QProcess::ExitStatus exitStatus)
+{
+    ui->progressBar->setVisible(false);
+    if(exitStatus == QProcess::NormalExit && exitcode == 0){
+        msg_box->showInfo("Video Summarized Successfully");
+    }else{
+        msg_box->showError("Video Couldnt Summarize see error log");
+    }
+    ui->gen_sum_btn->setEnabled(true);
+    ui->comboBox->setEnabled(true);
+    ui->cancelButton->setVisible(false);
+    ui->progreess_bar_lbl->setText("");
+
 }
 
 void Home::on_image_radio_btn_clicked()
@@ -270,4 +301,17 @@ void Home::on_output_btn_clicked()
 {
     QUrl url(reader->getOutputPath());
     QDesktopServices::openUrl(url);
+}
+
+void Home::on_cancelButton_clicked()
+{
+    QMessageBox confirm;
+    confirm.setText("Are you sure you want to cancel the process?");
+    confirm.setIcon(QMessageBox::Question);
+    confirm.addButton(QMessageBox::No);
+    confirm.addButton(QMessageBox::Yes);
+    int res = confirm.exec();
+    if(res == QMessageBox::Yes){
+        p->close();
+    }
 }
