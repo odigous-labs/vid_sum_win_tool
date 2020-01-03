@@ -22,7 +22,9 @@ Home::Home(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Home)
 {
+
     ui->setupUi(this);
+
 
     //initializing variables
     videoWidget =new VideoWidget(this);
@@ -84,6 +86,7 @@ void Home::on_play_button_clicked()
         emit on_playing_started();
 
     }
+
     is_playing = !is_playing;
 
 }
@@ -160,7 +163,7 @@ void Home::on_media_seek(int position)
 
 void Home::on_gen_sum_btn_clicked()
 {
-
+    params.clear();
     pythonPath = reader->getPythonPath();
     inputVideo =this->mediaPlayer->currentMedia().canonicalUrl().toString();
     if (inputVideo == ""){
